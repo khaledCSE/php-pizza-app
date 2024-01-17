@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: pizza_db
+      MYSQL_USER: khaled
+      MYSQL_PASSWORD: password
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./dumps:/home/sqeims/dumps
+    networks:
+      - php-pizza
+  www:
+    build: .
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - 80:80
+    networks:
+      - php-pizza
+    depends_on:
+      - db
+  php-my-admin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8001:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    networks:
+      - php-pizza
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+
+networks:
+  php-pizza:
+    driver: bridge
